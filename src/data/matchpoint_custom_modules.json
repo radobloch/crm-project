@@ -1,0 +1,84 @@
+{
+  "name": "moduly",
+  "title": "Moduły Niestandardowe & Rozszerzenia Klienta (Phase 4)",
+  "category": "System Architecture",
+  "fields": [
+    { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+    { "name": "kod", "type": "string", "title": "Unikalny Kod Modułu (np. ticketing, forecasting)", "required": true, "unique": true },
+    { "name": "nazwa", "type": "string", "title": "Nazwa Modułu", "required": true },
+    { "name": "opis", "type": "text", "title": "Opis Funkcjonalny" },
+    { "name": "kategoria", "type": "select", "options": [{ "value": "Obsługa Klienta" }, { "value": "Analityka & Prognozy" }, { "value": "Integracje" }, { "value": "Własne Obiekty" }], "defaultValue": "Własne Obiekty" },
+    { "name": "aktywny", "type": "boolean", "title": "Czy Moduł Aktywny", "defaultValue": true },
+    { "name": "klient_id", "type": "bigInt", "title": "ID Klienta / Najemcy (Multi-tenant)", "defaultValue": 1 },
+    { "name": "dostepne_role", "type": "json", "title": "Role z dostępem (RBAC)", "defaultValue": ["Super Admin", "Vertriebsleitung", "Team-Lead"] },
+    { "name": "schemat_kolekcji", "type": "json", "title": "Definicje Nowych Tabel i Pól (JSON Schema)", "defaultValue": {} },
+    { "name": "konfiguracja", "type": "json", "title": "Ustawienia i Klucze API", "defaultValue": {} },
+    { "name": "created_at", "type": "createdAt" },
+    { "name": "updated_at", "type": "updatedAt" }
+  ],
+  "sampleModules": [
+    {
+      "kod": "ticketing",
+      "nazwa": "Ticketing (System Obsługi Zgłoszeń)",
+      "opis": "Moduł Helpdesku i wsparcia klienta powiązany z firmami i kontaktami",
+      "kategoria": "Obsługa Klienta",
+      "aktywny": true,
+      "klient_id": 1,
+      "dostepne_role": ["Super Admin", "Support", "Team-Lead"],
+      "schemat_kolekcji": {
+        "collections": [
+          {
+            "name": "tickets",
+            "title": "Zgłoszenia Wsparcia (Tickets)",
+            "fields": [
+              { "name": "temat", "type": "string", "required": true },
+              { "name": "opis", "type": "text", "required": true },
+              { "name": "priorytet", "type": "select", "options": ["Niski", "Średni", "Wysoki", "Krytyczny"], "defaultValue": "Średni" },
+              { "name": "status", "type": "select", "options": ["Nowy", "W toku", "Oczekuje na klienta", "Rozwiązany", "Zamknięty"], "defaultValue": "Nowy" },
+              { "name": "kontakt_id", "type": "belongsTo", "target": "kontakty" },
+              { "name": "firma_id", "type": "belongsTo", "target": "firmy" },
+              { "name": "przypisany_do", "type": "belongsTo", "target": "uzytkownicy" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kod": "forecasting",
+      "nazwa": "Sales Forecasting & Predykcje AI",
+      "opis": "Zaawansowane prognozowanie przychodów na podstawie prawdopodobieństwa ważonego i historii wygranych szans",
+      "kategoria": "Analityka & Prognozy",
+      "aktywny": true,
+      "klient_id": 1,
+      "dostepne_role": ["Super Admin", "Vertriebsleitung", "Controlling"],
+      "schemat_kolekcji": {
+        "collections": [
+          {
+            "name": "prognozy_sprzedazy",
+            "title": "Prognozy Kwartalne (Forecasts)",
+            "fields": [
+              { "name": "okres", "type": "string", "required": true },
+              { "name": "plan_przychodow", "type": "decimal", "precision": 14, "scale": 2 },
+              { "name": "prognoza_wazona", "type": "decimal", "precision": 14, "scale": 2 },
+              { "name": "pipeline_id", "type": "belongsTo", "target": "pipelines" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kod": "integrations_zapier_slack_teams",
+      "nazwa": "Integracje Zewnętrzne (Zapier / Slack / MS Teams)",
+      "opis": "Dwukierunkowe powiadomienia o wygranych dealach i automatyczne tworzenie kanałów dla kluczowych klientów",
+      "kategoria": "Integracje",
+      "aktywny": true,
+      "klient_id": 1,
+      "dostepne_role": ["Super Admin"],
+      "konfiguracja": {
+        "slack_webhook_url": "https://hooks.slack.com/services/T00/B00/XXXX",
+        "teams_webhook_url": "https://company.webhook.office.com/webhookb2/XXXX",
+        "zapier_api_key": "zap_live_secret_key_matchpoint"
+      }
+    }
+  ]
+}

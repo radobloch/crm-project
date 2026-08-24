@@ -1,0 +1,67 @@
+{
+  "emailPluginConfig": {
+    "smtp": {
+      "host": "smtp.hostinger.com",
+      "port": 465,
+      "secure": true,
+      "authType": "login_or_oauth2",
+      "auth": {
+        "user": "crm@matchpoint-crm.pl",
+        "pass": "${SMTP_PASSWORD}"
+      },
+      "from": "\"Matchpoint CRM\" <crm@matchpoint-crm.pl>",
+      "rateLimitPerSecond": 10
+    },
+    "imap": {
+      "host": "imap.hostinger.com",
+      "port": 993,
+      "tls": true,
+      "auth": {
+        "user": "crm@matchpoint-crm.pl",
+        "pass": "${IMAP_PASSWORD}"
+      },
+      "syncIntervalMinutes": 5,
+      "autoMatchContactsByEmail": true
+    },
+    "storage": {
+      "type": "s3_compatible",
+      "endpoint": "https://s3.eu-central-1.wasabisys.com",
+      "bucket": "matchpoint-email-attachments",
+      "region": "eu-central-1",
+      "accessKeyId": "${S3_ACCESS_KEY}",
+      "secretAccessKey": "${S3_SECRET_KEY}",
+      "maxAttachmentSizeMb": 25
+    },
+    "bullmq": {
+      "redis": {
+        "host": "redis",
+        "port": 6379,
+        "password": "${REDIS_PASSWORD}"
+      },
+      "concurrency": 5,
+      "attempts": 3,
+      "backoff": {
+        "type": "exponential",
+        "delay": 2000
+      }
+    }
+  },
+  "templates": [
+    {
+      "id": "tpl_oferta_enterprise",
+      "name": "Przesłanie Oferty Handlowej",
+      "category": "Sprzedaż",
+      "subject": "Oferta współpracy dla {{firma.nazwa}} - Matchpoint CRM",
+      "bodyHtml": "<p>Dzień dobry {{kontakt.imie}},</p><p>Dziękuję za owocne spotkanie. W nawiązaniu do naszej rozmowy przesyłam spersonalizowaną ofertę wdrożenia platformy.</p><p><strong>Wartość szansy:</strong> {{deal.wartosc}} {{deal.waluta}}<br/><strong>Opiekun:</strong> {{user.imie}} {{user.nazwisko}}</p><p>Pozdrawiam serdecznie,<br/>{{user.imie}} {{user.nazwisko}}<br/>Matchpoint Team</p>",
+      "variables": ["kontakt.imie", "kontakt.nazwisko", "firma.nazwa", "deal.wartosc", "deal.waluta", "user.imie", "user.nazwisko"]
+    },
+    {
+      "id": "tpl_followup",
+      "name": "Follow-up po Prezentacji",
+      "category": "Follow-up",
+      "subject": "Podsumowanie prezentacji systemu dla {{firma.nazwa}}",
+      "bodyHtml": "<p>Cześć {{kontakt.imie}},</p><p>Chciałem podziękować za czas poświęcony na dzisiejszą prezentację. Czy udało się przeanalizować przesłane materiały?</p><p>Chętnie odpowiem na wszelkie pytania techniczne.</p><p>Z poważaniem,<br/>{{user.imie}}</p>",
+      "variables": ["kontakt.imie", "firma.nazwa", "user.imie"]
+    }
+  ]
+}

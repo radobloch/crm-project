@@ -1,0 +1,156 @@
+{
+  "collections": [
+    {
+      "name": "kampanie",
+      "title": "Kampanie Mailowe",
+      "category": "Marketing & Automation",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "title": "Nazwa Kampanii", "required": true },
+        { "name": "temat", "type": "string", "title": "Temat Wiadomości", "required": true },
+        { "name": "typ_tresci", "type": "select", "options": [{ "label": "HTML", "value": "HTML" }, { "label": "Plain Text", "value": "Plain Text" }], "defaultValue": "HTML" },
+        { "name": "tresc", "type": "text", "title": "Treść Wiadomości", "required": true },
+        { "name": "filtr_odbiorcow", "type": "json", "title": "Filtry Segmentacji Kontaktów (JSON)", "defaultValue": {} },
+        {
+          "name": "status",
+          "type": "select",
+          "title": "Status Kampanii",
+          "options": [
+            { "label": "Szkic", "value": "Szkic", "color": "gray" },
+            { "label": "Zaplanowana", "value": "Zaplanowana", "color": "blue" },
+            { "label": "Wysyłanie", "value": "Wysyłanie", "color": "amber" },
+            { "label": "Zakończona", "value": "Zakończona", "color": "green" },
+            { "label": "Wstrzymana", "value": "Wstrzymana", "color": "red" }
+          ],
+          "defaultValue": "Szkic"
+        },
+        { "name": "data_wysylki", "type": "datetime", "title": "Zaplanowana Data Wysyłki" },
+        {
+          "name": "powtarzanie",
+          "type": "select",
+          "title": "Częstotliwość Powtarzania",
+          "options": [
+            { "label": "Jednorazowo", "value": "Brak" },
+            { "label": "Codziennie", "value": "Codziennie" },
+            { "label": "Co tydzień", "value": "Co tydzień" },
+            { "label": "Co miesiąc", "value": "Co miesiąc" }
+          ],
+          "defaultValue": "Brak"
+        },
+        { "name": "liczba_odbiorcow", "type": "integer", "title": "Liczba Odbiorców", "defaultValue": 0 },
+        { "name": "wyslane", "type": "integer", "title": "Wysłane", "defaultValue": 0 },
+        { "name": "otwarte", "type": "integer", "title": "Otwarcia (Open Count)", "defaultValue": 0 },
+        { "name": "klikniecia", "type": "integer", "title": "Kliknięcia (Click Count)", "defaultValue": 0 },
+        { "name": "odbicia", "type": "integer", "title": "Odbicia (Bounces)", "defaultValue": 0 },
+        { "name": "uzytkownik_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "uzytkownik_id", "title": "Autor Kampanii" },
+        { "name": "created_at", "type": "createdAt" },
+        { "name": "updated_at", "type": "updatedAt" }
+      ]
+    },
+    {
+      "name": "zadania",
+      "title": "Zadania & Follow-upy",
+      "category": "Activities & Tasks",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "tytul", "type": "string", "title": "Tytuł Zadania", "required": true },
+        { "name": "opis", "type": "text", "title": "Opis / Notatki" },
+        {
+          "name": "priorytet",
+          "type": "select",
+          "title": "Priorytet",
+          "options": [
+            { "label": "Niski", "value": "Niski", "color": "blue" },
+            { "label": "Średni", "value": "Średni", "color": "amber" },
+            { "label": "Wysoki", "value": "Wysoki", "color": "red" }
+          ],
+          "defaultValue": "Średni"
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "title": "Status Zadania",
+          "options": [
+            { "label": "Do zrobienia", "value": "Do zrobienia", "color": "gray" },
+            { "label": "W trakcie", "value": "W trakcie", "color": "blue" },
+            { "label": "Zakończone", "value": "Zakończone", "color": "green" },
+            { "label": "Anulowane", "value": "Anulowane", "color": "red" }
+          ],
+          "defaultValue": "Do zrobienia"
+        },
+        { "name": "data_terminu", "type": "datetime", "title": "Termin Wykonania (Due Date)", "required": true },
+        { "name": "przypomnienie_at", "type": "datetime", "title": "Termin Przypomnienia" },
+        { "name": "kontakt_id", "type": "belongsTo", "target": "kontakty", "foreignKey": "kontakt_id", "title": "Powiązany Kontakt" },
+        { "name": "firma_id", "type": "belongsTo", "target": "firmy", "foreignKey": "firma_id", "title": "Powiązana Firma" },
+        { "name": "deal_id", "type": "belongsTo", "target": "deale", "foreignKey": "deal_id", "title": "Powiązana Szansa (Deal)" },
+        { "name": "uzytkownik_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "uzytkownik_id", "title": "Przypisany Handlowiec", "required": true },
+        { "name": "sekwencja_id", "type": "belongsTo", "target": "sekwencje_zadan", "foreignKey": "sekwencja_id", "title": "Z Sekwencji" },
+        { "name": "created_at", "type": "createdAt" },
+        { "name": "updated_at", "type": "updatedAt" }
+      ]
+    },
+    {
+      "name": "sekwencje_zadan",
+      "title": "Sekwencje Zadań (Playbooki Sprzedażowe)",
+      "category": "Marketing & Automation",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "title": "Nazwa Sekwencji (np. Onboarding Klienta, Follow-up po Ofercie)", "required": true },
+        { "name": "opis", "type": "text", "title": "Opis Sekwencji" },
+        {
+          "name": "wyzwalacz",
+          "type": "select",
+          "title": "Wyzwalacz (Trigger)",
+          "options": [
+            { "label": "Nowy Kontakt", "value": "NEW_CONTACT" },
+            { "label": "Nowy Deal", "value": "NEW_DEAL" },
+            { "label": "Zmiana Etapu Dealu na Ofertę", "value": "DEAL_STAGE_OFFER" },
+            { "label": "Manualne Uruchomienie", "value": "MANUAL" }
+          ],
+          "defaultValue": "MANUAL"
+        },
+        { "name": "kroki", "type": "json", "title": "Kroki Sekwencji (Szablon Zadań i Dni Opóźnienia)", "defaultValue": [] },
+        { "name": "aktywna", "type": "boolean", "title": "Czy Sekwencja Aktywna", "defaultValue": true },
+        { "name": "created_at", "type": "createdAt" },
+        { "name": "updated_at", "type": "updatedAt" }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "id": "block_calendar_zadania",
+      "type": "calendar",
+      "title": "Kalendarz Zadań Handlowych",
+      "collection": "zadania",
+      "config": {
+        "startField": "data_terminu",
+        "titleField": "tytul",
+        "colorField": "priorytet",
+        "colorPalette": {
+          "Wysoki": "#ef4444",
+          "Średni": "#f59e0b",
+          "Niski": "#3b82f6"
+        },
+        "defaultView": "month"
+      }
+    },
+    {
+      "id": "block_table_kampanie",
+      "type": "table",
+      "title": "Lista Kampanii Mailowych & Statystyki",
+      "collection": "kampanie",
+      "config": {
+        "columns": [
+          { "field": "nazwa", "title": "Nazwa Kampanii" },
+          { "field": "temat", "title": "Temat E-mail" },
+          { "field": "status", "title": "Status", "badge": true },
+          { "field": "data_wysylki", "title": "Termin Wysyłki" },
+          { "field": "wyslane", "title": "Wysłane" },
+          { "field": "otwarte", "title": "Otwarcia" },
+          { "field": "klikniecia", "title": "Kliknięcia" },
+          { "field": "powtarzanie", "title": "Częstotliwość" }
+        ]
+      }
+    }
+  ]
+}

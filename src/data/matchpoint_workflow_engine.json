@@ -1,0 +1,99 @@
+{
+  "name": "workflowy",
+  "title": "Automatyzacje & Workflow Engine",
+  "category": "Workflow & Logic",
+  "fields": [
+    { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+    { "name": "nazwa", "type": "string", "title": "Nazwa Reguły Workflow", "required": true },
+    { "name": "opis", "type": "text", "title": "Opis Działania" },
+    {
+      "name": "trigger_typ",
+      "type": "select",
+      "title": "Typ Wyzwalacza (Trigger)",
+      "options": [
+        { "label": "Nowy Rekord (On Create)", "value": "ON_CREATE" },
+        { "label": "Aktualizacja Rekordu (On Update)", "value": "ON_UPDATE" },
+        { "label": "Harmonogram Czasowy (Scheduled / Inactivity)", "value": "SCHEDULED" },
+        { "label": "Webhook / Zewnętrzny Event", "value": "WEBHOOK" }
+      ],
+      "required": true
+    },
+    {
+      "name": "kolekcja",
+      "type": "select",
+      "title": "Kolekcja Źródłowa",
+      "options": [
+        { "label": "Deale (Szanse Sprzedaży)", "value": "deale" },
+        { "label": "Kontakty", "value": "kontakty" },
+        { "label": "Firmy", "value": "firmy" },
+        { "label": "Aktywności", "value": "aktywnosci" }
+      ],
+      "required": true
+    },
+    { "name": "warunki", "type": "json", "title": "Drzewo Warunków (Logic Conditions JSON)", "defaultValue": [] },
+    { "name": "akcje", "type": "json", "title": "Sekwencja Akcji (Actions Pipeline JSON)", "defaultValue": [] },
+    { "name": "aktywny", "type": "boolean", "title": "Czy Aktywny", "defaultValue": true },
+    { "name": "ostatnie_uruchomienie", "type": "datetime", "title": "Ostatnie Uruchomienie" },
+    { "name": "licznik_wykonan", "type": "integer", "title": "Liczba Wykonań", "defaultValue": 0 },
+    { "name": "created_at", "type": "createdAt" },
+    { "name": "updated_at", "type": "updatedAt" }
+  ],
+  "sampleWorkflows": [
+    {
+      "nazwa": "Lead Scoring & Kwalifikacja Szansy",
+      "opis": "Automatyczne ustawienie statusu 'Klient/Kwalifikowany' jeśli wartość dealu > 5000 i była aktywność w ostatnich 3 dniach",
+      "trigger_typ": "ON_UPDATE",
+      "kolekcja": "deale",
+      "warunki": [
+        { "field": "wartosc", "operator": "gte", "value": 5000 },
+        { "field": "dni_od_ostatniej_aktywnosci", "operator": "lte", "value": 3 }
+      ],
+      "akcje": [
+        { "typ": "UPDATE_FIELD", "target": "kontakt", "field": "lifecycle_status", "value": "Klient" },
+        { "typ": "UPDATE_FIELD", "target": "deal", "field": "prawdopodobienstwo", "value": 80 },
+        { "typ": "AI_ENRICHMENT", "prompt": "Wygeneruj zwięzłe podsumowanie profilu ryzyka dla tego deala na podstawie branży powiązanej firmy" }
+      ],
+      "aktywny": true
+    },
+    {
+      "nazwa": "Automatyczny Follow-up po 3 dniach ciszy",
+      "opis": "Tworzenie zadania 'Follow-up do klienta' dla opiekuna, jeśli od 3 dni nie było żadnej aktywności w otwartym dealu",
+      "trigger_typ": "SCHEDULED",
+      "kolekcja": "deale",
+      "warunki": [
+        { "field": "etap_id", "operator": "ne", "value": 5 },
+        { "field": "dni_bez_aktywnosci", "operator": "gte", "value": 3 }
+      ],
+      "akcje": [
+        {
+          "typ": "CREATE_TASK",
+          "tytul": "Follow-up: Brak kontaktu od 3 dni",
+          "priorytet": "Wysoki",
+          "dni_do_terminu": 1,
+          "przypisz_do": "deal.owner_id"
+        },
+        {
+          "typ": "SEND_EMAIL",
+          "odbiorca": "deal.owner_id",
+          "szablon": "Powiadomienie: Deal wymaga Twojej uwagi z powodu braku aktywności"
+        }
+      ],
+      "aktywny": true
+    },
+    {
+      "nazwa": "Powiadomienie & Webhook przy Zmianie Etapu na Ofertę",
+      "opis": "Wysłanie webhooka do systemu ERP oraz e-maila z gratulacjami do handlowca po przejściu do etapu 'Oferta Handlowa'",
+      "trigger_typ": "ON_UPDATE",
+      "kolekcja": "deale",
+      "warunki": [
+        { "field": "etap_id", "operator": "eq", "value": 3 }
+      ],
+      "akcje": [
+        { "typ": "UPDATE_FIELD", "target": "deal", "field": "prawdopodobienstwo", "value": 60 },
+        { "typ": "SEND_EMAIL", "odbiorca": "deal.owner_id", "temat": "Nowy etap oferty: {{deal.nazwa}}" },
+        { "typ": "TRIGGER_WEBHOOK", "url": "https://erp.firma.pl/api/v1/deal-stage-synced", "method": "POST" }
+      ],
+      "aktywny": true
+    }
+  ]
+}

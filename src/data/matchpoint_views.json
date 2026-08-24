@@ -1,0 +1,233 @@
+{
+  "pages": [
+    {
+      "key": "contacts_companies_page",
+      "title": "Kontakty & Firmy (HubSpot Style)",
+      "blocks": [
+        {
+          "id": "block_table_kontakty",
+          "type": "table",
+          "title": "Wszystkie Kontakty",
+          "collection": "kontakty",
+          "config": {
+            "inlineEdit": true,
+            "rowSelection": "multiple",
+            "pagination": { "pageSize": 20 },
+            "defaultSort": [
+              { "field": "created_at", "order": "desc" },
+              { "field": "nazwisko", "order": "asc" }
+            ],
+            "filterSchema": {
+              "quickFilters": [
+                { "field": "lifecycle_status", "type": "select", "operator": "in" },
+                { "field": "owner_id", "type": "userSelect", "operator": "eq" }
+              ]
+            },
+            "columns": [
+              { "field": "imie", "title": "Imię", "editable": true, "width": 140 },
+              { "field": "nazwisko", "title": "Nazwisko", "editable": true, "width": 160 },
+              { "field": "email", "title": "Email", "editable": true, "width": 220 },
+              { "field": "firma_id", "title": "Firma", "displayField": "nazwa", "editable": true, "width": 180 },
+              { "field": "owner_id", "title": "Opiekun Kontaktu", "displayField": "imie_nazwisko", "editable": true, "width": 160 },
+              { "field": "lifecycle_status", "title": "Status Cyklu Życia", "editable": true, "badge": true, "width": 140 },
+              { "field": "created_at", "title": "Data Utworzenia", "format": "YYYY-MM-DD HH:mm", "editable": false, "width": 160 }
+            ],
+            "bulkActions": [
+              { "key": "export_csv", "title": "Eksportuj do CSV", "action": "export", "icon": "Download" },
+              { "key": "batch_reassign", "title": "Zmień Opiekuna (Owner)", "action": "bulkUpdate", "field": "owner_id", "icon": "UserCheck" },
+              { "key": "batch_delete", "title": "Usuń zaznaczone", "action": "destroy", "confirm": true, "icon": "Trash2" }
+            ]
+          }
+        },
+        {
+          "id": "block_table_firmy",
+          "type": "table",
+          "title": "Katalog Firm B2B",
+          "collection": "firmy",
+          "config": {
+            "inlineEdit": true,
+            "rowSelection": "multiple",
+            "pagination": { "pageSize": 20 },
+            "defaultSort": [{ "field": "created_at", "order": "desc" }],
+            "filterSchema": {
+              "quickFilters": [
+                { "field": "branza", "type": "select", "operator": "eq" },
+                { "field": "rozmiar", "type": "select", "operator": "in" },
+                { "field": "owner_id", "type": "userSelect", "operator": "eq" }
+              ]
+            },
+            "columns": [
+              { "field": "nazwa", "title": "Nazwa Firmy", "editable": true, "width": 200 },
+              { "field": "domain", "title": "Domena", "editable": true, "width": 180 },
+              { "field": "branza", "title": "Branża", "editable": true, "width": 150 },
+              { "field": "rozmiar", "title": "Wielkość", "editable": true, "width": 120 },
+              { "field": "owner_id", "title": "Opiekun Firmy", "editable": true, "width": 160 },
+              { "field": "created_at", "title": "Data Rejestracji", "format": "YYYY-MM-DD", "editable": false, "width": 140 }
+            ],
+            "bulkActions": [
+              { "key": "export_csv", "title": "Eksportuj do CSV", "action": "export" },
+              { "key": "batch_reassign", "title": "Zmień Opiekuna", "action": "bulkUpdate", "field": "owner_id" },
+              { "key": "batch_delete", "title": "Usuń zaznaczone", "action": "destroy", "confirm": true }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "deal_board_page",
+      "title": "Pipeline Szans Sprzedaży (Kanban)",
+      "blocks": [
+        {
+          "id": "block_kanban_deale",
+          "type": "kanban",
+          "title": "Lejek B2B Enterprise",
+          "collection": "deale",
+          "config": {
+            "groupField": "etap_id",
+            "groupDataSource": {
+              "collection": "etapy",
+              "sort": [{ "field": "kolejnosc", "order": "asc" }],
+              "titleField": "nazwa",
+              "keyField": "id"
+            },
+            "card": {
+              "titleField": "nazwa",
+              "fields": [
+                { "field": "wartosc", "formatter": "currency", "currencyField": "waluta" },
+                { "field": "firma_id", "displayField": "nazwa", "icon": "Building" },
+                { "field": "owner_id", "displayField": "imie_nazwisko", "icon": "User" },
+                { "field": "data_zamkniecia", "format": "YYYY-MM-DD", "icon": "Calendar" }
+              ],
+              "badges": [
+                { "field": "priorytet", "colorMap": { "pilny": "red", "wysoki": "amber", "sredni": "blue" } }
+              ]
+            },
+            "columnHeader": {
+              "showCount": true,
+              "aggregations": [
+                { "type": "sum", "field": "wartosc", "title": "Suma Etapu", "formatter": "currency" }
+              ]
+            },
+            "dragAndDrop": {
+              "enabled": true,
+              "updateField": "etap_id",
+              "onDropAction": "api/v1/deale:update"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "activities_calendar_page",
+      "title": "Kalendarz Aktywności",
+      "blocks": [
+        {
+          "id": "block_calendar_aktywnosci",
+          "type": "calendar",
+          "title": "Harmonogram Działań Handlowych",
+          "collection": "aktywnosci",
+          "config": {
+            "startField": "data",
+            "titleField": "tresc",
+            "defaultView": "month",
+            "availableViews": ["month", "week", "day", "agenda"],
+            "colorField": "typ",
+            "colorPalette": {
+              "Spotkanie": "#3b82f6",
+              "Telefoniczny": "#10b981",
+              "Notatka": "#8b5cf6",
+              "Zadanie": "#f59e0b"
+            },
+            "quickCreate": {
+              "enabled": true,
+              "defaultValues": { "typ": "Spotkanie" },
+              "fields": ["typ", "tresc", "data", "kontakt_id", "deal_id", "uzytkownik_id"]
+            },
+            "eventDetailModal": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "dashboard_page",
+      "title": "Pulpit Metryk (CRM Analytics)",
+      "blocks": [
+        {
+          "id": "kpi_contacts_total",
+          "type": "statisticCard",
+          "title": "Kontakty Łącznie",
+          "collection": "kontakty",
+          "config": {
+            "metric": "count",
+            "comparison": { "type": "monthOverMonth", "dateField": "created_at" },
+            "icon": "Users",
+            "color": "emerald"
+          }
+        },
+        {
+          "id": "kpi_deals_active_won",
+          "type": "statisticCard",
+          "title": "Szanse Sprzedaży (W Toku / Wygrane)",
+          "collection": "deale",
+          "config": {
+            "metric": "count",
+            "filter": { "etap_id": { "$ne": 5 } },
+            "secondaryMetric": { "type": "sum", "field": "wartosc", "formatter": "currency" },
+            "icon": "TrendingUp",
+            "color": "blue"
+          }
+        },
+        {
+          "id": "kpi_avg_cycle_days",
+          "type": "statisticCard",
+          "title": "Średni Czas Zamknięcia (Dni)",
+          "collection": "deale",
+          "config": {
+            "metric": "customSql",
+            "sqlQuery": "SELECT COALESCE(ROUND(AVG(EXTRACT(DAY FROM (updated_at - created_at)))), 0) as val FROM deale WHERE etap_id = 5",
+            "suffix": " dni",
+            "icon": "Clock",
+            "color": "amber"
+          }
+        },
+        {
+          "id": "chart_deals_by_stage",
+          "type": "chart",
+          "chartType": "pie",
+          "title": "Rozkład Dealów według Etapów Lejka",
+          "collection": "deale",
+          "config": {
+            "dimension": "etapy.nazwa",
+            "metric": "count",
+            "join": { "table": "etapy", "on": "deale.etap_id = etapy.id" },
+            "legend": "right"
+          }
+        },
+        {
+          "id": "chart_deals_revenue_monthly",
+          "type": "chart",
+          "chartType": "bar",
+          "title": "Wartość Szans (Pipeline) w Rozbiciu na Miesiące (PLN)",
+          "collection": "deale",
+          "config": {
+            "dimension": { "field": "data_zamkniecia", "granularity": "month" },
+            "metric": { "type": "sum", "field": "wartosc" },
+            "color": "#3b82f6"
+          }
+        },
+        {
+          "id": "chart_activities_by_type",
+          "type": "chart",
+          "chartType": "doughnut",
+          "title": "Aktywności Zespołu według Typu",
+          "collection": "aktywnosci",
+          "config": {
+            "dimension": "typ",
+            "metric": "count",
+            "colorPalette": ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"]
+          }
+        }
+      ]
+    }
+  ]
+}

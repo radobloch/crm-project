@@ -15,8 +15,11 @@ import {
   Filter,
   Check,
   RotateCcw,
+  SlidersHorizontal,
+  Layers,
 } from 'lucide-react';
 import { Workflow, Collection, WorkflowExecutionLog } from '../types';
+import { WorkflowBuilderWYSIWYG } from './WorkflowBuilderWYSIWYG';
 
 interface WorkflowBuilderProps {
   workflows: Workflow[];
@@ -31,6 +34,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
   onToggleWorkflow,
   onAddWorkflow,
 }) => {
+  const [activeMode, setActiveMode] = useState<'visual' | 'wysiwyg_designer'>('wysiwyg_designer');
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string>(workflows[0]?.id || '');
   const [executionLogs, setExecutionLogs] = useState<WorkflowExecutionLog[]>([
     {
@@ -115,9 +119,34 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           </p>
         </div>
 
-        {/* Action button */}
-        <div className="flex items-center space-x-2">
-          {currentWorkflow && (
+        {/* Mode Switcher & Action button */}
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center bg-zinc-950 p-1 rounded-lg border border-[#27272a]">
+            <button
+              onClick={() => setActiveMode('wysiwyg_designer')}
+              className={`flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-md font-medium transition-all ${
+                activeMode === 'wysiwyg_designer'
+                  ? 'bg-amber-500 text-zinc-950 font-bold shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>WYSIWYG Builder & Simulator</span>
+            </button>
+            <button
+              onClick={() => setActiveMode('visual')}
+              className={`flex items-center space-x-1.5 text-xs px-2.5 py-1 rounded-md font-medium transition-all ${
+                activeMode === 'visual'
+                  ? 'bg-zinc-800 text-white font-bold shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Pipeline View</span>
+            </button>
+          </div>
+
+          {activeMode === 'visual' && currentWorkflow && (
             <button
               onClick={handleTestRun}
               disabled={isSimulating}
@@ -134,8 +163,14 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
         </div>
       </div>
 
-      {/* Main Builder Grid */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Main Content Area: Switch between WYSIWYG and Classic Pipeline View */}
+      {activeMode === 'wysiwyg_designer' ? (
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-zinc-950">
+          <WorkflowBuilderWYSIWYG />
+        </div>
+      ) : (
+        /* Main Builder Grid */
+        <div className="flex-1 flex overflow-hidden">
         {/* Left: Workflow Selection List */}
         <div className="w-72 bg-zinc-900/60 border-r border-[#27272a] p-4 flex flex-col justify-between shrink-0">
           <div className="space-y-2">
@@ -271,6 +306,7 @@ export const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

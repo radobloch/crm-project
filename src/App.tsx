@@ -4,6 +4,8 @@ import {
   INITIAL_RECORDS,
   INITIAL_WORKFLOWS,
   INITIAL_ROLES,
+  MATCHPOINT_COLLECTIONS,
+  MATCHPOINT_RECORDS,
 } from './data/initialData';
 import { Collection, RecordItem, ViewType, Workflow, RolePermission, CollectionField } from './types';
 import { Header } from './components/Header';
@@ -18,8 +20,10 @@ import { SchemaBuilderModal } from './components/SchemaBuilderModal';
 import { WorkflowBuilder } from './components/WorkflowBuilder';
 import { ApiExplorer } from './components/ApiExplorer';
 import { RolePermissionManager } from './components/RolePermissionManager';
+import { CustomModulesManager } from './components/CustomModulesManager';
 import { ImportExportModal } from './components/ImportExportModal';
 import { AboutNocoBaseModal } from './components/AboutNocoBaseModal';
+import { MatchpointPostgresDeployer } from './components/MatchpointPostgresDeployer';
 
 export default function App() {
   // Collections & Records State
@@ -201,6 +205,14 @@ export default function App() {
     }));
   };
 
+  // Load Matchpoint CRM 12 Tables Preset
+  const handleLoadMatchpointCollections = () => {
+    setCollections(MATCHPOINT_COLLECTIONS);
+    setRecordsMap(MATCHPOINT_RECORDS);
+    setSelectedCollectionId('kontakty');
+    setActiveTab('collection');
+  };
+
   return (
     <div className="h-screen w-screen flex flex-col bg-[#09090b] font-sans antialiased text-[#fafafa] overflow-hidden">
       {/* Top Application Header */}
@@ -320,6 +332,8 @@ export default function App() {
               onToggleWorkflow={handleToggleWorkflow}
               onAddWorkflow={handleAddWorkflow}
             />
+          ) : activeTab === 'custom_modules' ? (
+            <CustomModulesManager />
           ) : activeTab === 'roles' ? (
             <RolePermissionManager
               roles={roles}
@@ -330,6 +344,10 @@ export default function App() {
             <ApiExplorer
               collections={collections}
               recordsMap={recordsMap}
+            />
+          ) : activeTab === 'matchpoint' ? (
+            <MatchpointPostgresDeployer
+              onLoadMatchpointCollections={handleLoadMatchpointCollections}
             />
           ) : null}
         </main>

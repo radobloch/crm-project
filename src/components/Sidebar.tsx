@@ -17,6 +17,7 @@ import {
   FileSpreadsheet,
   Download,
   Upload,
+  Boxes,
 } from 'lucide-react';
 import { Collection, ViewType } from '../types';
 
@@ -173,6 +174,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
+        {/* Matchpoint CRM Special Module */}
+        <div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 px-2 mb-1.5 flex items-center justify-between">
+            <span>Matchpoint Project</span>
+            <span className="text-[9px] bg-emerald-950/80 text-emerald-300 border border-emerald-800/40 px-1.5 py-0.2 rounded font-mono">
+              PG 18
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            <button
+              onClick={() => setActiveTab('matchpoint')}
+              className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-md text-xs font-semibold transition-colors ${
+                activeTab === 'matchpoint'
+                  ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/60 shadow-xs'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900/80 border border-transparent'
+              }`}
+            >
+              <Database className="w-4 h-4 text-emerald-400" />
+              <div className="text-left truncate">
+                <div className="truncate">PostgreSQL 18 & Hostinger</div>
+                <div className="text-[10px] text-zinc-500 font-normal">12 Tabel, RLS & Triggery</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
         {/* Platform Modules (NocoBase Architecture Core) */}
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 px-2 mb-1.5">
@@ -189,6 +216,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Workflow className="w-4 h-4 text-amber-500" />
               <span>Workflows & Automations</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('custom_modules')}
+              className={`w-full flex items-center space-x-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors ${
+                activeTab === 'custom_modules'
+                  ? 'bg-zinc-800 text-sky-400 border border-zinc-700/60 shadow-xs'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/80'
+              }`}
+            >
+              <Boxes className="w-4 h-4 text-sky-400" />
+              <span>Custom Modules (Phase 4)</span>
             </button>
 
             <button

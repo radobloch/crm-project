@@ -94,6 +94,11 @@ export const Header: React.FC<HeaderProps> = ({
               <Code2 className="w-3.5 h-3.5 text-blue-400" />
               <span className="font-medium">REST API & SQL Schema Hub</span>
             </div>
+          ) : activeTab === 'matchpoint' ? (
+            <div className="flex items-center space-x-1.5 text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
+              <Database className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="font-medium">Matchpoint CRM • PostgreSQL 18 & Hostinger</span>
+            </div>
           ) : null}
         </div>
       </div>

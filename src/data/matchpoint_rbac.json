@@ -1,0 +1,142 @@
+{
+  "roles": [
+    {
+      "name": "super_admin",
+      "title": "Super Admin",
+      "description": "Kierownictwo & IT - Pełna kontrola nad strukturą danych, użytkownikami, rolami, wdrożeniami i systemem",
+      "allowConfigure": true,
+      "allowNewMenu": true,
+      "require2FA": true,
+      "permissions": {
+        "collections": {
+          "*": {
+            "view": "alle",
+            "create": "alle",
+            "update": "alle",
+            "delete": "alle",
+            "export": "alle",
+            "merge": "alle"
+          }
+        },
+        "system": {
+          "manageUsers": true,
+          "manageRoles": true,
+          "managePipelines": true,
+          "manageCustomFields": true,
+          "manageAuditLog": true,
+          "manageBackups": true
+        }
+      }
+    },
+    {
+      "name": "vertriebsleitung",
+      "title": "Vertriebsleitung (Head of Sales)",
+      "description": "Dyrektor Sprzedaży - Pełna widoczność wszystkich danych w CRM, konfiguracja pipeline'ów, zmiana właścicieli (owner)",
+      "allowConfigure": false,
+      "allowNewMenu": false,
+      "require2FA": true,
+      "permissions": {
+        "collections": {
+          "kontakty": { "view": "alle", "create": "alle", "update": "alle", "delete": "alle", "export": "alle", "merge": "alle" },
+          "firmy": { "view": "alle", "create": "alle", "update": "alle", "delete": "alle", "export": "alle", "merge": "alle" },
+          "deale": { "view": "alle", "create": "alle", "update": "alle", "delete": "alle", "export": "alle", "merge": "alle" },
+          "aktywnosci": { "view": "alle", "create": "alle", "update": "alle", "delete": "alle", "export": "alle", "merge": "alle" },
+          "pipelines": { "view": "alle", "create": "alle", "update": "alle", "delete": "alle", "export": "alle", "merge": "alle" },
+          "etapy": { "view": "alle", "create": "alle", "update": "alle", "delete": "alle", "export": "alle", "merge": "alle" }
+        },
+        "system": {
+          "manageUsers": false,
+          "manageRoles": false,
+          "managePipelines": true,
+          "reassignAnyOwner": true,
+          "viewAllReports": true
+        }
+      }
+    },
+    {
+      "name": "team_lead",
+      "title": "Team-Lead (Kierownik Regionu)",
+      "description": "Lider Zespołu - Widoczność i edycja danych własnego zespołu, przenoszenie dealów w zespole, raporty teamowe",
+      "allowConfigure": false,
+      "allowNewMenu": false,
+      "require2FA": true,
+      "permissions": {
+        "collections": {
+          "kontakty": { "view": "team", "create": "team", "update": "team", "delete": "none", "export": "team", "merge": "team" },
+          "firmy": { "view": "team", "create": "team", "update": "team", "delete": "none", "export": "team", "merge": "team" },
+          "deale": { "view": "team", "create": "team", "update": "team", "delete": "none", "export": "team", "merge": "team" },
+          "aktywnosci": { "view": "team", "create": "team", "update": "team", "delete": "team", "export": "team", "merge": "none" },
+          "pipelines": { "view": "alle", "create": "none", "update": "none", "delete": "none", "export": "none", "merge": "none" }
+        },
+        "system": {
+          "reassignTeamDeals": true,
+          "viewTeamReports": true
+        }
+      }
+    },
+    {
+      "name": "sales_rep",
+      "title": "Sales Rep (Handlowiec)",
+      "description": "Handlowiec - Tworzenie i edycja własnych rekordów oraz dostęp do rekordów nieprzypisanych (unassigned)",
+      "allowConfigure": false,
+      "allowNewMenu": false,
+      "require2FA": true,
+      "permissions": {
+        "collections": {
+          "kontakty": { "view": "eigene", "create": "eigene", "update": "eigene", "delete": "none", "export": "none", "merge": "none" },
+          "firmy": { "view": "eigene", "create": "eigene", "update": "eigene", "delete": "none", "export": "none", "merge": "none" },
+          "deale": { "view": "eigene", "create": "eigene", "update": "eigene", "delete": "none", "export": "none", "merge": "none" },
+          "aktywnosci": { "view": "eigene", "create": "eigene", "update": "eigene", "delete": "eigene", "export": "none", "merge": "none" },
+          "pipelines": { "view": "alle", "create": "none", "update": "none", "delete": "none", "export": "none", "merge": "none" }
+        },
+        "system": {
+          "claimUnassigned": true
+        }
+      }
+    },
+    {
+      "name": "marketing",
+      "title": "Marketing (Phase 2)",
+      "description": "Dział Marketingu - Dostęp do kontaktów w trybie odczytu, kampanie, brak dostępu do dealów i pipeline",
+      "allowConfigure": false,
+      "allowNewMenu": false,
+      "require2FA": true,
+      "permissions": {
+        "collections": {
+          "kontakty": { "view": "alle", "create": "alle", "update": "alle", "delete": "none", "export": "alle", "merge": "alle" },
+          "firmy": { "view": "alle", "create": "none", "update": "none", "delete": "none", "export": "alle", "merge": "none" },
+          "deale": { "view": "none", "create": "none", "update": "none", "delete": "none", "export": "none", "merge": "none" },
+          "aktywnosci": { "view": "alle", "create": "alle", "update": "eigene", "delete": "none", "export": "none", "merge": "none" }
+        },
+        "system": {
+          "manageCampaigns": true,
+          "marketingLists": true
+        }
+      }
+    },
+    {
+      "name": "controlling",
+      "title": "Controlling (Finanse)",
+      "description": "Dział Kontrolingu i Finansów - Pełna widoczność wszystkich danych w trybie tylko do odczytu (read-only) oraz eksport raportów",
+      "allowConfigure": false,
+      "allowNewMenu": false,
+      "require2FA": true,
+      "permissions": {
+        "collections": {
+          "*": {
+            "view": "alle",
+            "create": "none",
+            "update": "none",
+            "delete": "none",
+            "export": "alle",
+            "merge": "none"
+          }
+        },
+        "system": {
+          "accessFinancialDashboards": true,
+          "exportAuditReports": true
+        }
+      }
+    }
+  ]
+}

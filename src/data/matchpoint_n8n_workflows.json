@@ -1,0 +1,166 @@
+{
+  "name": "Matchpoint CRM - n8n Automation Workflows",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "node-schedule-campaigns",
+      "name": "Harmonogram Kampanii (Co 15 min)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://matchpoint_nocobase:13000/api/kampanie:list",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "{\"status\":\"Zaplanowana\",\"data_wysylki\":{\"$lte\":\"{{ $now.toISOString() }}\"}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-get-pending-campaigns",
+      "name": "Pobierz Zaplanowane Kampanie",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://matchpoint_nocobase:13000/api/kontakty:list",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "={{ JSON.stringify($json.filtr_odbiorcow || { consent: true }) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-get-recipients",
+      "name": "Pobierz Odbiorców z Filtrem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "crm@matchpoint-crm.pl",
+        "toEmail": "={{ $json.email }}",
+        "subject": "={{ $('node-get-pending-campaigns').item.json.temat }}",
+        "html": "={{ $('node-get-pending-campaigns').item.json.tresc.replace('{{kontakt.imie}}', $json.imie) }}",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "node-send-email",
+      "name": "Wyślij przez Hostinger SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://matchpoint_nocobase:13000/api/aktywnosci:create",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "typ", "value": "E-mail" },
+            { "name": "tresc", "value": "=Wysłano kampanię: {{ $('node-get-pending-campaigns').item.json.nazwa }}" },
+            { "name": "kontakt_id", "value": "={{ $json.id }}" },
+            { "name": "uzytkownik_id", "value": "={{ $('node-get-pending-campaigns').item.json.uzytkownik_id || 1 }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-log-activity",
+      "name": "Zaloguj Aktywność w NocoBase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nocobase-deal-stage-change",
+        "options": {}
+      },
+      "id": "node-webhook-deal-stage",
+      "name": "Webhook: Zmiana Etapu Dealu",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 560]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://matchpoint_nocobase:13000/api/zadania:create",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "tytul", "value": "=Follow-up: Sprawdzenie oferty dla {{ $json.body.deal_nazwa }}" },
+            { "name": "priorytet", "value": "Wysoki" },
+            { "name": "status", "value": "Do zrobienia" },
+            { "name": "data_terminu", "value": "={{ new Date(Date.now() + 3*24*60*60*1000).toISOString() }}" },
+            { "name": "deal_id", "value": "={{ $json.body.deal_id }}" },
+            { "name": "kontakt_id", "value": "={{ $json.body.kontakt_id }}" },
+            { "name": "uzytkownik_id", "value": "={{ $json.body.owner_id }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-create-task-followup",
+      "name": "Utwórz Zadanie Follow-up (3 dni)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [500, 560]
+    }
+  ],
+  "connections": {
+    "node-schedule-campaigns": {
+      "main": [
+        [{ "node": "node-get-pending-campaigns", "type": "main", "index": 0 }]
+      ]
+    },
+    "node-get-pending-campaigns": {
+      "main": [
+        [{ "node": "node-get-recipients", "type": "main", "index": 0 }]
+      ]
+    },
+    "node-get-recipients": {
+      "main": [
+        [{ "node": "node-send-email", "type": "main", "index": 0 }]
+      ]
+    },
+    "node-send-email": {
+      "main": [
+        [{ "node": "node-log-activity", "type": "main", "index": 0 }]
+      ]
+    },
+    "node-webhook-deal-stage": {
+      "main": [
+        [{ "node": "node-create-task-followup", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

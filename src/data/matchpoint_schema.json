@@ -1,0 +1,163 @@
+{
+  "collections": [
+    {
+      "name": "role",
+      "title": "Role",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true, "unique": true },
+        { "name": "uprawnienia", "type": "json", "defaultValue": {} }
+      ]
+    },
+    {
+      "name": "teams",
+      "title": "Zespoły",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true, "unique": true },
+        { "name": "leader_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "leader_id" }
+      ]
+    },
+    {
+      "name": "uzytkownicy",
+      "title": "Użytkownicy",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "imie", "type": "string", "required": true },
+        { "name": "nazwisko", "type": "string", "required": true },
+        { "name": "email", "type": "email", "required": true, "unique": true },
+        { "name": "haslo_hash", "type": "password" },
+        { "name": "rola_id", "type": "belongsTo", "target": "role", "foreignKey": "rola_id" }
+      ]
+    },
+    {
+      "name": "firmy",
+      "title": "Firmy",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true },
+        { "name": "branza", "type": "string" },
+        { "name": "rozmiar", "type": "select", "options": [{ "value": "Mikro" }, { "value": "Małe" }, { "value": "Średnie" }, { "value": "Duże" }], "defaultValue": "Małe" },
+        { "name": "domain", "type": "string", "unique": true },
+        { "name": "nadrzedna_firma_id", "type": "belongsTo", "target": "firmy", "foreignKey": "nadrzedna_firma_id" },
+        { "name": "owner_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "owner_id" }
+      ]
+    },
+    {
+      "name": "kontakty",
+      "title": "Kontakty",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "imie", "type": "string", "required": true },
+        { "name": "nazwisko", "type": "string", "required": true },
+        { "name": "email", "type": "email", "required": true, "unique": true },
+        { "name": "telefon", "type": "string" },
+        { "name": "firma_id", "type": "belongsTo", "target": "firmy", "foreignKey": "firma_id" },
+        { "name": "owner_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "owner_id" },
+        { "name": "lifecycle_status", "type": "select", "options": [{ "value": "Lead" }, { "value": "Kontakt" }, { "value": "Klient" }, { "value": "Były Klient" }], "defaultValue": "Lead" },
+        { "name": "zrodlo", "type": "select", "options": [{ "value": "HubSpot" }, { "value": "Manualny" }, { "value": "Import" }], "defaultValue": "Manualny" },
+        { "name": "consent", "type": "boolean", "defaultValue": false },
+        { "name": "wlasciwosci", "type": "json", "defaultValue": {} }
+      ]
+    },
+    {
+      "name": "pipelines",
+      "title": "Lejki",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true }
+      ]
+    },
+    {
+      "name": "etapy",
+      "title": "Etapy Lejka",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true },
+        { "name": "pipeline_id", "type": "belongsTo", "target": "pipelines", "foreignKey": "pipeline_id", "required": true },
+        { "name": "prawdopodobienstwo", "type": "integer", "defaultValue": 20 },
+        { "name": "kolejnosc", "type": "integer", "defaultValue": 1 }
+      ]
+    },
+    {
+      "name": "deale",
+      "title": "Deale (Szanse Sprzedaży)",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true },
+        { "name": "wartosc", "type": "decimal", "precision": 14, "scale": 2, "required": true },
+        { "name": "waluta", "type": "select", "options": [{ "value": "PLN" }, { "value": "EUR" }, { "value": "USD" }], "defaultValue": "PLN" },
+        { "name": "pipeline_id", "type": "belongsTo", "target": "pipelines", "foreignKey": "pipeline_id", "required": true },
+        { "name": "etap_id", "type": "belongsTo", "target": "etapy", "foreignKey": "etap_id", "required": true },
+        { "name": "data_zamkniecia", "type": "date" },
+        { "name": "prawdopodobienstwo", "type": "integer", "defaultValue": 50 },
+        { "name": "owner_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "owner_id" },
+        { "name": "team_id", "type": "belongsTo", "target": "teams", "foreignKey": "team_id" }
+      ]
+    },
+    {
+      "name": "aktywnosci",
+      "title": "Aktywności",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "typ", "type": "select", "options": [{ "value": "Notatka" }, { "value": "Zadanie" }, { "value": "Telefoniczny" }, { "value": "Spotkanie" }], "defaultValue": "Zadanie" },
+        { "name": "tresc", "type": "text", "required": true },
+        { "name": "data", "type": "datetime", "required": true },
+        { "name": "kontakt_id", "type": "belongsTo", "target": "kontakty", "foreignKey": "kontakt_id" },
+        { "name": "deal_id", "type": "belongsTo", "target": "deale", "foreignKey": "deal_id" },
+        { "name": "uzytkownik_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "uzytkownik_id", "required": true }
+      ]
+    },
+    {
+      "name": "powiazania",
+      "title": "Verknüpfungen (Powiązania M:N)",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "typ", "type": "string" },
+        { "name": "obiekt1_id", "type": "bigInt", "required": true },
+        { "name": "obiekt1_typ", "type": "string", "required": true },
+        { "name": "obiekt2_id", "type": "bigInt", "required": true },
+        { "name": "obiekt2_typ", "type": "string", "required": true },
+        { "name": "rola", "type": "string" }
+      ]
+    },
+    {
+      "name": "wlasciwosci",
+      "title": "Eigenschaften (Właściwości)",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true },
+        { "name": "typ", "type": "select", "options": [{ "value": "Text" }, { "value": "Number" }, { "value": "Boolean" }, { "value": "Select" }, { "value": "Date" }, { "value": "User" }] },
+        { "name": "kolekcja", "type": "select", "options": [{ "value": "Kontakty" }, { "value": "Firmy" }, { "value": "Deale" }] }
+      ]
+    },
+    {
+      "name": "widoki",
+      "title": "Ansichten (Widoki)",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "nazwa", "type": "string", "required": true },
+        { "name": "kolekcja", "type": "string", "required": true },
+        { "name": "filtry", "type": "json", "defaultValue": {} },
+        { "name": "kolumny", "type": "json", "defaultValue": [] },
+        { "name": "sortowanie", "type": "json", "defaultValue": [] },
+        { "name": "publiczny", "type": "boolean", "defaultValue": false },
+        { "name": "uzytkownik_id", "type": "belongsTo", "target": "uzytkownicy", "foreignKey": "uzytkownik_id" }
+      ]
+    },
+    {
+      "name": "audit_log",
+      "title": "Audit Log",
+      "fields": [
+        { "name": "id", "type": "bigInt", "autoIncrement": true, "primaryKey": true },
+        { "name": "akcja", "type": "string", "required": true },
+        { "name": "kolekcja", "type": "string", "required": true },
+        { "name": "obiekt_id", "type": "bigInt", "required": true },
+        { "name": "uzytkownik_id", "type": "bigInt" },
+        { "name": "stare_dane", "type": "json" },
+        { "name": "nowe_dane", "type": "json" },
+        { "name": "data", "type": "datetime", "defaultValue": "CURRENT_TIMESTAMP" }
+      ]
+    }
+  ]
+}

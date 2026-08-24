@@ -1,0 +1,6 @@
+{
+  "name": "NocoBase Studio",
+  "description": "Extensible no-code and low-code data management platform inspired by NocoBase, featuring dynamic collection schemas, custom blocks, table/kanban/calendar/form views, and workflow automation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
